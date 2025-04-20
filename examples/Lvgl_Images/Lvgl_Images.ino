@@ -15,10 +15,11 @@ LilyGo_Class amoled;
 static uint8_t btnPin = 21;
 AceButton button(btnPin);
 
+
 static uint8_t image_index = 1;
 static lv_obj_t *img1;
 static int16_t x, y;
-
+volatile bool sleep_flag = false;
 
 // Image resources need to define the screen size
 // #define USE_AMOLED_147    //1.47 inches 194x368
@@ -99,6 +100,18 @@ void handleEvent(AceButton * /* button */, uint8_t eventType,
     case AceButton::kEventPressed:
         updateImages();
         break;
+    case AceButton::kEventLongPressed:
+
+        Serial.println("Enter sleep !");  
+        sleep_flag = true;
+        Serial.println();
+        Wire.end();
+
+        Serial.println("Sleep Start!");
+        delay(5000);
+        esp_deep_sleep_start();
+        Serial.println("This place will never print!");
+        break;
     default: break;
     }
 }
@@ -167,6 +180,9 @@ void setup()
 
 void loop()
 {
+    if (sleep_flag) {
+        return;
+    }
     amoled.getPoint(&x, &y);
     lv_task_handler();
     button.check();
