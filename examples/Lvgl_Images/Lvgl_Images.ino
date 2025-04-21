@@ -12,7 +12,7 @@
 using namespace ace_button;
 
 LilyGo_Class amoled;
-static uint8_t btnPin = 21;
+static uint8_t btnPin = 0;
 AceButton button(btnPin);
 
 
@@ -112,7 +112,8 @@ void handleEvent(AceButton * /* button */, uint8_t eventType,
         esp_deep_sleep_start();
         Serial.println("This place will never print!");
         break;
-    default: break;
+    default: 
+    break;
     }
 }
 
@@ -174,6 +175,12 @@ void setup()
 
     //Initial BOOT button, used as setting direction trigger
     pinMode(btnPin, INPUT_PULLUP);
+    // Configure the ButtonConfig with the event handler.
+    ButtonConfig* buttonConfig = ButtonConfig::getSystemButtonConfig();
+    buttonConfig->setEventHandler(handleEvent);
+    buttonConfig->setFeature(ButtonConfig::kFeatureLongPress);
+    buttonConfig->setFeature(ButtonConfig::kFeatureRepeatPress);
+    buttonConfig->setFeature(ButtonConfig::kFeatureSuppressAfterLongPress);
     button.setEventHandler(handleEvent);
 }
 
